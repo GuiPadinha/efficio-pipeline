@@ -21,7 +21,7 @@ ruff check .                      # code style
 
 No access to the real data? Run it on the made-up sample: `python -m company_pipeline --data sample_data`.
 
-Requires Python 3.14. Options: `python -m company_pipeline --data <folder> --out <folder>`.
+Requires Python 3.14. Options: `python -m company_pipeline --data <folder> --out <folder> [--write-model]`.
 
 **Exit codes:**
 - `0`: everything was written.
@@ -31,11 +31,11 @@ Requires Python 3.14. Options: `python -m company_pipeline --data <folder> --out
 
 | File | Rows | Content |
 |---|---|---|
-| `companies_enriched.parquet` | 876 | **Main output.** One row per company, with its parent's name. The Global Ultimates also carry their `data_blocks` detail. |
-| `company.parquet` | 876 | One row per company, with `parent_duns` (who owns it) |
-| `company_detail.parquet` | 3 | Extra detail for the top company of each family |
-| `company_role.parquet` | 1 633 | The roles each company plays in its family (Subsidiary, Parent/Headquarters, …) |
-| `industry_code.parquet` | 36 | The ranked industry classifications of the Global Ultimates |
+| `companies_enriched.parquet` | 876 | **The output.** One row per company, with `parent_duns`, its parent's name and, for the Global Ultimates, their `data_blocks` detail. |
+| `model/company.parquet` | 876 | *Only with `--write-model`.* The model's company table |
+| `model/company_detail.parquet` | 3 | *Only with `--write-model`.* Extra detail for the top company of each family |
+| `model/company_role.parquet` | 1 633 | *Only with `--write-model`.* The roles each company plays (Subsidiary, Parent/Headquarters, …) |
+| `model/industry_code.parquet` | 36 | *Only with `--write-model`.* The ranked industry classifications of the Global Ultimates |
 | `rejects.csv` | only if needed | Companies that could not be used, with the reason |
 | `pipeline.log` | | What the run did, including every warning |
 
@@ -56,7 +56,8 @@ read → extract → validate → check → join → write
    consistent, and so on. **If any check fails, nothing is written.** A wrong table is worse than no table.
 5. **Join.** `enrich_companies` attaches each company's parent name and the `data_blocks` detail. It uses left
    joins, validated as many-to-one and one-to-one, so no company can be added, lost or duplicated.
-6. **Write.** Parquet keeps the column types, so IDs stay text and numbers stay numbers.
+6. **Write.** One Parquet file, as the brief asks. With `--write-model`, the normalised tables of the ERD are
+   also written to `model/`. Parquet keeps the column types, so IDs stay text and numbers stay numbers.
 
 ## Data model
 
@@ -82,8 +83,11 @@ types, lookup tables, the remaining lists, and load lineage. Each change is list
   text, and no month or day is invented.
 - **Values are picked by meaning, not by position.** The consolidated employee count is first in Microsoft's
   list but second in the others, so it is selected by its D&B scope code.
-- **Model ≠ output file.** The model is normalised, so each fact lives in one place. The main output is a wide,
-  pre-joined table, because that is what a reader wants to query.
+- **One output file by default, with the model as an option.** The brief asks for *a* Parquet file, so the
+  default output is the single, wide, pre-joined table, which is what a reader wants to query. The model behind it
+  is normalised, with each fact in one place. `--write-model` writes that model too (one file per ERD table),
+  including the 1:N lists that can't fit in a one-row-per-company file. The two are kept apart (`model/`)
+  because they serve different readers.
 - **Derived data is not stored.** The source also lists each company's children. That is the same relationship
   as `parent_duns`, seen from the other side, so it is only used as a cross-check.
 
@@ -116,7 +120,7 @@ three-level family (Mother → Daughter → Granddaughter), with IDs that start 
 GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on every push and pull request:
 1. `ruff check .` checks the code style.
 2. `pytest` runs the unit test.
-3. `python -m company_pipeline --data sample_data` runs the whole pipeline, **including its data checks**, on a made-up
+3. `python -m company_pipeline --data sample_data --write-model` runs the whole pipeline, with every output and **its data checks**, on a made-up
    family ([sample_data/](sample_data/README.md)). The real data is confidential, so it is never in the repo.
    If any check fails, the exit code is 1 and the build goes red.
 

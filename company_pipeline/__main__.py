@@ -4,7 +4,7 @@ Each folder under --data holds one corporate family:
     data_blocks.json   detailed record of the family's top company (the Global Ultimate)
     family_tree.json   every member of the family, with its parent (who owns it)
 
-Run:  python -m company_pipeline --data data --out output
+Run:  python -m company_pipeline --data data --out output [--write-model]
 """
 
 import argparse
@@ -21,7 +21,7 @@ from company_pipeline.transform import build_tables, enrich_companies, run_check
 log = logging.getLogger("company_pipeline")
 
 
-def run(data_dir: Path, out_dir: Path) -> int:
+def run(data_dir: Path, out_dir: Path, write_model: bool = False) -> int:
     """read -> extract -> validate -> check -> join -> write. Returns the exit code: 0 = all written, 1 = needs attention."""
     groups = sorted(p for p in data_dir.iterdir() if p.is_dir()) if data_dir.is_dir() else []
     if not groups:
@@ -61,10 +61,18 @@ def run(data_dir: Path, out_dir: Path) -> int:
         return 1
     log.info("All data checks passed")
 
-    outputs = {"companies_enriched": enrich_companies(tables["company"], tables["company_detail"]), **tables}
-    for name, table in outputs.items():
-        table.to_parquet(out_dir / f"{name}.parquet", index=False)
-        log.info("Wrote %s.parquet (%d rows)", name, len(table))
+    # The deliverable: one Parquet file, one row per company (the join)
+    enriched = enrich_companies(tables["company"], tables["company_detail"])
+    enriched.to_parquet(out_dir / "companies_enriched.parquet", index=False)
+    log.info("Wrote companies_enriched.parquet (%d rows)", len(enriched))
+
+    # Optional: the normalised model itself, one file per ERD table (the 1:N lists only exist here)
+    if write_model:
+        model_dir = out_dir / "model"
+        model_dir.mkdir(exist_ok=True)
+        for name, table in tables.items():
+            table.to_parquet(model_dir / f"{name}.parquet", index=False)
+            log.info("Wrote model/%s.parquet (%d rows)", name, len(table))
 
     if failed_groups:
         log.error("Finished with unreadable groups: %s", failed_groups)
@@ -76,6 +84,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--data", type=Path, default=Path("data"), help="folder with one subfolder per company group")
     parser.add_argument("--out", type=Path, default=Path("output"), help="where Parquet files and the log are written")
+    parser.add_argument("--write-model", action="store_true",
+                        help="also write the normalised model tables (docs/erd.md) to <out>/model/")
     args = parser.parse_args()
 
     args.out.mkdir(parents=True, exist_ok=True)
@@ -84,7 +94,7 @@ def main() -> int:
         format="%(asctime)s %(levelname)-7s %(message)s",
         handlers=[logging.StreamHandler(), logging.FileHandler(args.out / "pipeline.log", mode="w", encoding="utf-8")],
     )
-    return run(args.data, args.out)
+    return run(args.data, args.out, args.write_model)
 
 
 if __name__ == "__main__":

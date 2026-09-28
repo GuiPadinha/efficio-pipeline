@@ -29,4 +29,4 @@ jobs:
       # The real D&B data is confidential and not in the repo, so CI runs the whole pipeline,
       # including its data checks, on a small made-up family. Exit code 1 fails the build.
       - name: Pipeline + data checks on sample data
-        run: python -m company_pipeline --data sample_data --out output
+        run: python -m company_pipeline --data sample_data --out output --write-model
