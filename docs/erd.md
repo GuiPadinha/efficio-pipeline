@@ -14,6 +14,7 @@ erDiagram
         int hierarchy_level "1 = Global Ultimate"
         string country_code "ISO alpha-2"
         string region
+        string county
         string city
         string postal_code
         string street_line1
@@ -37,6 +38,7 @@ erDiagram
         string incorporated_date
         string fiscal_year_end
         string default_currency
+        string telephone_country_code
         string telephone
         string website
         int employees_consolidated
@@ -51,10 +53,10 @@ erDiagram
     industry_code {
         string duns PK, FK
         int type_code PK "classification system (NAICS, SIC, ...)"
-        string code PK
+        int priority PK "rank within that system (1 = main activity)"
+        string code
         string type_description
         string description
-        int priority
     }
 ```
 
@@ -76,6 +78,9 @@ erDiagram
   a wide, pre-joined table, which is more convenient for analysis.
 - **Accepted repetition.** `sic_description` and `role_description` repeat for every company with the same
   code. Lookup tables would remove that, but they would add tables for very little gain at this size.
+- **`industry_code` is keyed by rank, not by code.** D&B ranks each company's activities (priority 1, 2, 3...)
+  per classification system, and the same code can fill several ranks: Microsoft lists "Software Publishers"
+  at priorities 1, 2 and 3. The pipeline's data checks caught this on the first run.
 - **Not modelled (possible extensions):** trade names (`tradeStyleNames`, up to 5 per company), stock
   exchanges, registration numbers, and the rest of the `data_blocks` lists. They all follow the same 1:N
   pattern as `industry_code`.
