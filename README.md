@@ -9,19 +9,19 @@ company that owns it.
 ```bash
 python -m venv .venv
 .venv\Scripts\activate            # Windows. On macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
+pip install -e ".[dev]"         # the package + pytest and ruff (pinned in pyproject.toml)
 
 # Put the input files in data/, one folder per corporate family:
 #   data/companyA/data_blocks.json
 #   data/companyA/family_tree.json
-python pipeline.py                # reads data/, writes output/
+python -m company_pipeline       # reads data/, writes output/
 pytest                            # the unit test
 ruff check .                      # code style
 ```
 
-No access to the real data? Run it on the made-up sample: `python pipeline.py --data sample_data`.
+No access to the real data? Run it on the made-up sample: `python -m company_pipeline --data sample_data`.
 
-Tested with Python 3.14. Options: `python pipeline.py --data <folder> --out <folder>`.
+Requires Python 3.14. Options: `python -m company_pipeline --data <folder> --out <folder>`.
 
 **Exit codes:**
 - `0`: everything was written.
@@ -104,7 +104,7 @@ assumed an industry code appears once per company, but Microsoft lists "Software
 
 ## Testing
 
-Following the brief, there is **one** unit test (`test_pipeline.py`), for the join. It builds a made-up
+Following the brief, there is **one** unit test ([tests/test_transform.py](tests/test_transform.py)), for the join. It builds a made-up
 three-level family (Mother → Daughter → Granddaughter), with IDs that start with zeros, and checks four things:
 - no company is added, lost or duplicated
 - each company gets the right parent
@@ -116,7 +116,7 @@ three-level family (Mother → Daughter → Granddaughter), with IDs that start 
 GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on every push and pull request:
 1. `ruff check .` checks the code style.
 2. `pytest` runs the unit test.
-3. `python pipeline.py --data sample_data` runs the whole pipeline, **including its data checks**, on a made-up
+3. `python -m company_pipeline --data sample_data` runs the whole pipeline, **including its data checks**, on a made-up
    family ([sample_data/](sample_data/README.md)). The real data is confidential, so it is never in the repo.
    If any check fails, the exit code is 1 and the build goes red.
 
@@ -160,14 +160,23 @@ steps (read → validate → join → check) map directly onto it.
 - **`data_blocks` is modelled selectively.** Its 63 fields cover only the 3 top companies. The most useful ones are
   modelled, and the rest are listed as extensions.
 
-## Repository layout
+## Project structure
 
 ```text
-pipeline.py              the pipeline (read → extract → validate → check → join → write)
-test_pipeline.py         the unit test for the join
-docs/erd.md              the data model
-docs/erd_future.md       possible next steps for the model
-sample_data/             a made-up family used by CI
-.github/workflows/ci.yml CI: ruff, pytest, pipeline on sample data
-requirements.txt         pinned dependencies
+company_pipeline/
+  extract.py       JSON -> validated rows: read the files, map columns, reject or clean bad data
+  transform.py     rows -> tables: build the model tables, join them, check them (pure logic, no file access)
+  __main__.py      orchestration: run the steps, log, write the outputs, set the exit code
+tests/
+  test_transform.py   the unit test for the join
+docs/
+  erd.md              the data model
+  erd_future.md       possible next steps for the model
+sample_data/          a made-up family used by CI
+.github/workflows/    CI: ruff, pytest, pipeline on sample data
+pyproject.toml        Python version, pinned dependencies, tool settings
 ```
+
+The code is split by **what touches the outside world**. `extract` reads files and `__main__` writes them.
+`transform` is pure logic, which is why the unit test can exercise the join with small in-memory tables, with no
+files and no mocks. Three modules are enough: more would only add imports between them.

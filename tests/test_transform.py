@@ -1,6 +1,6 @@
 import pandas as pd
 
-from pipeline import enrich_companies
+from company_pipeline.transform import enrich_companies
 
 
 def test_enrich_companies_attaches_parent_and_detail():

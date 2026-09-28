@@ -15,9 +15,10 @@ jobs:
         with:
           python-version: "3.14"
           cache: pip
+          cache-dependency-path: pyproject.toml
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -e ".[dev]"
 
       - name: Lint (ruff)
         run: ruff check .
@@ -28,4 +29,4 @@ jobs:
       # The real D&B data is confidential and not in the repo, so CI runs the whole pipeline,
       # including its data checks, on a small made-up family. Exit code 1 fails the build.
       - name: Pipeline + data checks on sample data
-        run: python pipeline.py --data sample_data --out output
+        run: python -m company_pipeline --data sample_data --out output
