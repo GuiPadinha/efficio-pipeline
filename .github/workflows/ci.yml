@@ -1,0 +1,31 @@
+# Runs on every push and pull request. Any failing step turns the run red.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Unit test (pytest)
+        run: pytest -q
+
+      # The real D&B data is confidential and not in the repo, so CI runs the whole pipeline,
+      # including its data checks, on a small made-up family. Exit code 1 fails the build.
+      - name: Pipeline + data checks on sample data
+        run: python pipeline.py --data sample_data --out output

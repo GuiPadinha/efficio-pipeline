@@ -1,0 +1,24 @@
+{
+  "duns": "000000001",
+  "primaryName": "Acme Holdings Ltd",
+  "registeredName": "ACME HOLDINGS LIMITED",
+  "isFortune1000Listed": null,
+  "isStandalone": false,
+  "businessEntityType": {"description": "Corporation", "dnbCode": 451},
+  "legalForm": {"description": "Private Limited Company", "dnbCode": 0},
+  "controlOwnershipType": {"description": "Privately owned", "dnbCode": 9058},
+  "incorporatedDate": "1990-04-02",
+  "fiscalYearEnd": "2025-12-31",
+  "defaultCurrency": "GBP",
+  "telephone": [{"telephoneNumber": "2000000000", "isdCode": "44"}],
+  "websiteAddress": [{"url": "www.acme.example", "domainName": "acme.example"}],
+  "numberOfEmployees": [
+    {"value": 15, "informationScopeDescription": "Headquarters Only (Employs Here)", "informationScopeDnBCode": 9068},
+    {"value": 900, "informationScopeDescription": "Consolidated", "informationScopeDnBCode": 9067}
+  ],
+  "industryCodes": [
+    {"code": "551112", "description": "Offices of Other Holding Companies", "typeDescription": "North American Industry Classification System 2022", "typeDnBCode": 37788, "priority": 1},
+    {"code": "551112", "description": "Offices of Other Holding Companies", "typeDescription": "North American Industry Classification System 2022", "typeDnBCode": 37788, "priority": 2},
+    {"code": "6719", "description": "Holding companies", "typeDescription": "US Standard Industry Code 1987 - 4 digit", "typeDnBCode": 399, "priority": 1}
+  ]
+}

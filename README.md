@@ -19,6 +19,8 @@ pytest                            # the unit test
 ruff check .                      # code style
 ```
 
+No access to the real data? Run it on the made-up sample: `python pipeline.py --data sample_data`.
+
 Tested with Python 3.14. Options: `python pipeline.py --data <folder> --out <folder>`.
 
 **Exit codes:**
@@ -106,6 +108,15 @@ three-level family (Mother → Daughter → Granddaughter), with IDs that start 
 - the top company has no parent
 - the detail lands only on the top company
 
+## Continuous integration
+
+GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on every push and pull request:
+1. `ruff check .` checks the code style.
+2. `pytest` runs the unit test.
+3. `python pipeline.py --data sample_data` runs the whole pipeline, **including its data checks**, on a made-up
+   family ([sample_data/](sample_data/README.md)). The real data is confidential, so it is never in the repo.
+   If any check fails, the exit code is 1 and the build goes red.
+
 ## Confidential data
 
 **Nothing confidential is in this repository**, by design:
@@ -116,7 +127,7 @@ three-level family (Mother → Daughter → Granddaughter), with IDs that start 
 | The task brief | marked *Confidential* | `*.pdf` is in `.gitignore` |
 | Outputs | derived from the input data | `output/` is in `.gitignore` |
 
-The unit test uses made-up companies, so tests run without the real data. To run the pipeline, copy the input
+The unit test and CI use made-up companies, so they run without the real data. To run the pipeline, copy the input
 files into `data/` as shown above.
 
 ## Scale
@@ -137,5 +148,4 @@ steps (read → validate → join → check) map directly onto it.
 
 ## To do
 
-- CI: GitHub Actions running ruff, the unit test, and the pipeline on a small made-up sample
 - A "future" ERD with the possible extensions (trade names, stock exchanges, registration numbers)

@@ -1,0 +1,91 @@
+{
+  "globalUltimateDuns": "000000001",
+  "globalUltimateFamilyTreeMembersCount": 4,
+  "familyTreeMembers": [
+    {
+      "duns": "000000001",
+      "primaryName": "Acme Holdings Ltd",
+      "startDate": "1990",
+      "primaryAddress": {
+        "addressCountry": {"name": "United Kingdom", "isoAlpha2Code": "GB"},
+        "addressLocality": {"name": "London"},
+        "postalCode": "EC1A 1AA",
+        "streetAddress": {"line1": "1 Example Street"}
+      },
+      "primaryIndustryCode": {"usSicV4": "6719", "usSicV4Description": "Holding companies"},
+      "corporateLinkage": {
+        "familytreeRolesPlayed": [
+          {"description": "Global Ultimate", "dnbCode": 12775},
+          {"description": "Parent/Headquarters", "dnbCode": 9141}
+        ],
+        "hierarchyLevel": 1,
+        "children": [{"duns": "000000002"}, {"duns": "000000003"}]
+      },
+      "dunsControlStatus": {"isMarketable": true},
+      "numberOfEmployees": [{"value": 120}],
+      "financials": [{"yearlyRevenues": [{"value": 25000000.0}]}]
+    },
+    {
+      "duns": "000000002",
+      "primaryName": "Acme Software Ltd",
+      "startDate": "2001-05",
+      "primaryAddress": {
+        "addressCountry": {"name": "United Kingdom", "isoAlpha2Code": "GB"},
+        "addressLocality": {"name": "Manchester"},
+        "streetAddress": {"line1": "2 Sample Road", "line2": "Floor 3"}
+      },
+      "primaryIndustryCode": {"usSicV4": "7372", "usSicV4Description": "Prepackaged software services"},
+      "corporateLinkage": {
+        "familytreeRolesPlayed": [
+          {"description": "Subsidiary", "dnbCode": 9159},
+          {"description": "Parent/Headquarters", "dnbCode": 9141}
+        ],
+        "hierarchyLevel": 2,
+        "parent": {"duns": "000000001"},
+        "children": [{"duns": "000000004"}]
+      },
+      "dunsControlStatus": {"isMarketable": true},
+      "numberOfEmployees": [{"value": 45}],
+      "financials": [{"yearlyRevenues": [{"value": 8000000.0}]}],
+      "tradeStyleNames": [{"name": "Acme Soft", "priority": 1}]
+    },
+    {
+      "duns": "000000003",
+      "primaryName": "Acme Logistics GmbH",
+      "startDate": "2010-03-15",
+      "primaryAddress": {
+        "addressCountry": {"name": "Germany", "isoAlpha2Code": "DE"},
+        "addressLocality": {"name": "Hamburg"},
+        "addressRegion": {}
+      },
+      "primaryIndustryCode": {"usSicV4": "4731", "usSicV4Description": "Freight transportation arrangement"},
+      "corporateLinkage": {
+        "familytreeRolesPlayed": [
+          {"description": "Subsidiary", "dnbCode": 9159},
+          {"description": "Domestic Ultimate", "dnbCode": 12774}
+        ],
+        "hierarchyLevel": 2,
+        "parent": {"duns": "000000001"}
+      },
+      "dunsControlStatus": {"isMarketable": false},
+      "numberOfEmployees": [],
+      "financials": {}
+    },
+    {
+      "duns": "000000004",
+      "primaryName": "Acme Software Iberia Lda",
+      "startDate": null,
+      "primaryAddress": {
+        "addressCountry": {"name": "Portugal", "isoAlpha2Code": "PT"},
+        "addressLocality": {"name": "Lisboa"},
+        "postalCode": "1000-001"
+      },
+      "corporateLinkage": {
+        "familytreeRolesPlayed": [{"description": "Subsidiary", "dnbCode": 9159}],
+        "hierarchyLevel": 3,
+        "parent": {"duns": "000000002"}
+      },
+      "dunsControlStatus": {"isMarketable": true}
+    }
+  ]
+}
