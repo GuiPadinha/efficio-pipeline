@@ -65,6 +65,9 @@ See **[docs/erd.md](docs/erd.md)** for the ERD and the reasoning behind it. In s
 - a separate 1:0..1 table holds the Global Ultimate detail
 - two 1:N tables hold the lists (roles and industry codes)
 
+**[docs/erd_future.md](docs/erd_future.md)** shows where the model could go next: ownership history, all address
+types, lookup tables, the remaining lists, and load lineage. Each change is listed with the question it answers.
+
 ## Key decisions
 
 - **All 876 companies, not only the 3 in `data_blocks`.** Read literally, the brief attaches the parent ID to
@@ -146,6 +149,25 @@ with no infrastructure changes. These are not implemented:
 If the infrastructure *could* change, the next step would be a distributed engine such as Spark. The same
 steps (read → validate → join → check) map directly onto it.
 
-## To do
+## Known limitations
 
-- A "future" ERD with the possible extensions (trade names, stock exchanges, registration numbers)
+- **Date checks cover the shape only.** `1986-13` would pass. A range check on month and day would close this,
+  but no such value appears in the data.
+- **Only the current parent is kept.** When a company changes owner, the previous link is overwritten.
+  `ownership_history` in the future ERD addresses this.
+- **Figures are passed through as reported.** In `family_tree`, employee and revenue figures come with no scope
+  or currency label, so they are stored as-is. They are not converted and not "corrected".
+- **`data_blocks` is modelled selectively.** Its 63 fields cover only the 3 top companies. The most useful ones are
+  modelled, and the rest are listed as extensions.
+
+## Repository layout
+
+```text
+pipeline.py              the pipeline (read → extract → validate → check → join → write)
+test_pipeline.py         the unit test for the join
+docs/erd.md              the data model
+docs/erd_future.md       possible next steps for the model
+sample_data/             a made-up family used by CI
+.github/workflows/ci.yml CI: ruff, pytest, pipeline on sample data
+requirements.txt         pinned dependencies
+```
