@@ -1,0 +1,11 @@
+# Dados e documentos confidenciais: nunca vão para o GitHub (decisão D4)
+data/
+output/
+notes/
+*.pdf
+
+# Ambiente Python e caches (cada pessoa gera os seus)
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
