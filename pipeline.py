@@ -7,8 +7,6 @@ Each folder under --data holds one corporate family:
 Run:  python pipeline.py --data data --out output
 """
 
-from __future__ import annotations
-
 import argparse
 import json
 import logging
