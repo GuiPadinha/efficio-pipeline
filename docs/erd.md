@@ -74,8 +74,9 @@ erDiagram
 - **The hierarchy is a self-reference.** `parent_duns` points to another row of `company`, so one column
   handles a tree of any depth. The `children` lists in the source are **not stored**: they are the same
   relationship seen from the other side. The pipeline uses them only as a consistency check.
-- **Model ≠ output file.** The model is normalized: each fact lives in one place. The Parquet output can be
-  a wide, pre-joined table, which is more convenient for analysis.
+- **Model ≠ output file.** The model is normalised: each fact lives in one place. The default Parquet output
+  is one wide, pre-joined table (`companies_enriched`), which is more convenient for analysis. Running with
+  `--write-model` also writes these tables, one file each, to `output/model/`.
 - **Accepted repetition.** `sic_description` and `role_description` repeat for every company with the same
   code. Lookup tables would remove that, but they would add tables for very little gain at this size.
 - **`industry_code` is keyed by rank, not by code.** D&B ranks each company's activities (priority 1, 2, 3...)
