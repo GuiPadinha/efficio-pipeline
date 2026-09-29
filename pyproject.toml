@@ -3,7 +3,9 @@ name = "company-pipeline"
 version = "0.1.0"
 description = "D&B company data (JSON) -> validated, linked tables -> Parquet"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11"  # CI tests 3.11, 3.12, 3.13 and 3.14
+# Direct dependencies only. Their own dependencies (numpy, tzdata, ...) are resolved at install time, since there
+# is no lock file yet. See README > Known limitations.
 dependencies = [
     "pandas==3.0.6",
     "pyarrow==25.0.1",

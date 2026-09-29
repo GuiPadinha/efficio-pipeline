@@ -4,6 +4,12 @@ A Python pipeline that turns Dun & Bradstreet company data (two JSON files per c
 validated, linked tables saved as Parquet. The output has one row per company, and each row points to the
 company that owns it.
 
+**At a glance**
+- **Run it:** see *Quick start* below. It needs no real data: `python -m company_pipeline --data sample_data`.
+- **Output:** `output/companies_enriched.parquet`, with 876 companies, each linked to its parent.
+- **Read first:** [Key decisions](#key-decisions), [Scale](#scale) and the [ERD](docs/erd.md).
+- **Quality:** validation, data checks that block bad output, one unit test, and CI on Python 3.11–3.14.
+
 ## Quick start
 
 ```bash
@@ -187,3 +193,14 @@ pyproject.toml        Python version, pinned dependencies, tool settings
 The code is split by **what touches the outside world**. `extract` reads files and `__main__` writes them.
 `transform` is pure logic, which is why the unit test can exercise the join with small in-memory tables, with no
 files and no mocks. Three modules are enough: more would only add imports between them.
+
+## Author's note
+
+- I explored the data before writing any code, and the key decisions came from there: reading all 876 companies
+  instead of 3, keeping IDs as text because of leading zeros, and handling the four ways "missing" is written.
+- I kept the build deliberately small: 3 modules, 1 test and standard tools. The bigger ideas are written up
+  instead of built (see [Scale](#scale) and [docs/erd_future.md](docs/erd_future.md)).
+- I used Claude (Anthropic's AI assistant) as a pair-programmer. I directed the design, reviewed every change,
+  and I'm happy to walk through any decision or trade-off.
+
+Guilherme
