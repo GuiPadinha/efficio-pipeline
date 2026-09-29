@@ -60,6 +60,36 @@ erDiagram
     }
 ```
 
+### Plain-text version
+
+For viewers that don't render Mermaid. An arrow points from a foreign key to the key it references.
+
+```text
+          parent_duns -> duns  (self-reference: 0..1 parent, N children)
+         +------------------------+
+         |                        |
+         v                        |
++--------------------------------+|            +----------------------------------+
+| company                  (876) |+            | company_detail               (3) |
+|--------------------------------|   1 : 0..1  |----------------------------------|
+| PK duns                        |<------------| PK,FK duns                       |
+| FK parent_duns  (NULL = top)   |             | registered_name, legal_form,     |
+| name, hierarchy_level,         |             | website, telephone, ...          |
+| address, start_date, sic_code, |             | employees_consolidated           |
+| employees, revenue, ...        |             +----------------------------------+
++--------------------------------+
+        ^                  ^
+        | 1 : N            | 1 : N
++--------------------+  +----------------------------------+
+| company_role       |  | industry_code               (36) |
+|            (1 633) |  |----------------------------------|
+|--------------------|  | PK,FK duns                       |
+| PK,FK duns         |  | PK type_code, PK priority        |
+| PK role_code       |  | code, type_description,          |
+| role_description   |  | description                      |
++--------------------+  +----------------------------------+
+```
+
 ## Sources
 
 | Table | Source | Rows |

@@ -21,7 +21,7 @@ ruff check .                      # code style
 
 No access to the real data? Run it on the made-up sample: `python -m company_pipeline --data sample_data`.
 
-Requires Python 3.14. Options: `python -m company_pipeline --data <folder> --out <folder> [--write-model]`.
+Requires Python 3.11 or newer (CI tests 3.11 to 3.14). Options: `python -m company_pipeline --data <folder> --out <folder> [--write-model]`.
 
 **Exit codes:**
 - `0`: everything was written.
@@ -117,7 +117,7 @@ three-level family (Mother → Daughter → Granddaughter), with IDs that start 
 
 ## Continuous integration
 
-GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on every push and pull request:
+GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on every push and pull request, on Python 3.11, 3.12, 3.13 and 3.14:
 1. `ruff check .` checks the code style.
 2. `pytest` runs the unit test.
 3. `python -m company_pipeline --data sample_data --write-model` runs the whole pipeline, with every output and **its data checks**, on a made-up
@@ -161,6 +161,9 @@ steps (read → validate → join → check) map directly onto it.
   `ownership_history` in the future ERD addresses this.
 - **Figures are passed through as reported.** In `family_tree`, employee and revenue figures come with no scope
   or currency label, so they are stored as-is. They are not converted and not "corrected".
+- **Only direct dependencies are pinned.** `pyproject.toml` fixes pandas, pyarrow, pytest and ruff, but not their
+  own dependencies (numpy, for example). A production setup would add a lock file (for example with `pip-tools`
+  or `uv`) so that every install resolves exactly the same versions.
 - **`data_blocks` is modelled selectively.** Its 63 fields cover only the 3 top companies. The most useful ones are
   modelled, and the rest are listed as extensions.
 
